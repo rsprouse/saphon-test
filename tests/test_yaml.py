@@ -9,21 +9,23 @@ def docs_by_doctype(docs):
     synth = None
     refs = []
     for doc in docs:
+        try:
+            assert(doc['doctype'] in ('synthesis', 'ref'))
+        except AssertionError:
+            raise AssertionError(f"Unrecognized doctype \'{doc['doctype']}\'")
         if doc['doctype'] == 'synthesis':
-            assert(synth is None)
+            try:
+                assert(synth is None)
+            except AssertionError:
+                raise AssertionError('Multiple synthesis documents found')
             synth = doc
         elif doc['doctype'] == 'ref':
             refs.append(doc)
-        else:
-            raise f"Unrecognized doctype {doc['doctype']}"
     return (synth, refs)
 
 def check_docs(docs):
     '''Check docs read from a yaml file for correctness and completeness.'''
-    try:
-        synth, refs = docs_by_doctype(docs)
-    except AssertionError:
-        raise AssertionError('Multiple synthesis documents found.')
+    synth, refs = docs_by_doctype(docs)
     assert(synth is not None)
     assert(refs != [])
 
@@ -36,5 +38,8 @@ def test_read_yaml():
                 check_docs(docs)
             except Exception as e:
                 errors += f'Error in {fname}: {e}\n'
-    if errors != '':
-        raise Exception(errors)
+    try:
+        assert(errors == '')
+    except AssertionError:
+        print(errors)
+        raise AssertionError(errors)
