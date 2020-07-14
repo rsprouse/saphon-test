@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-import pytest
-import os, glob
+import glob
 import math
 import yaml
+
 
 def check_dictfld(fld, d):
     '''Check that a dict key exists and its value is not None.'''
@@ -14,6 +14,7 @@ def check_dictfld(fld, d):
     except KeyError:
         raise AssertionError(f'Field `{fld}` is missing.')
 
+
 def assert_boolean(fld, d):
     '''Check a dict's boolean field for correctness.'''
     check_dictfld(fld, d)
@@ -21,6 +22,7 @@ def assert_boolean(fld, d):
         assert(isinstance(d[fld], bool))
     except AssertionError:
         raise AssertionError(f'Field `{fld}` value must be `True` or `False`.')
+
 
 def assert_strfld(fld, d):
     '''Check a dict's string field for correctness.'''
@@ -30,6 +32,7 @@ def assert_strfld(fld, d):
         assert(d[fld].strip() != '')
     except AssertionError:
         raise AssertionError(f'Field `{fld}` must be non-empty.')
+
 
 def check_strlist(fld, d):
     '''Check a list of strings in a dict value.'''
@@ -42,6 +45,7 @@ def check_strlist(fld, d):
         except AssertionError:
             raise AssertionError(f'Values in `{fld}` field must be non-empty.')
 
+
 def check_graphemes2phonemes(doc):
     '''Check graphemes2phonemes values.'''
     check_dictfld('graphemes2phonemes', doc)
@@ -50,6 +54,7 @@ def check_graphemes2phonemes(doc):
             continue
         for fld in ('grapheme', 'phoneme'):
             assert_strfld(fld, mapping)
+
 
 def check_ref_allophones(doc):
     '''Check ref_allophones values.'''
@@ -60,6 +65,7 @@ def check_ref_allophones(doc):
         for fld in ('grapheme_allophone', 'grapheme_phoneme'):
             assert_strfld(fld, mapping)
 
+
 def check_allophones(doc):
     '''Check allophones values.'''
     check_dictfld('allophones', doc)
@@ -68,6 +74,7 @@ def check_allophones(doc):
             continue
         for fld in ('allophone', 'phoneme'):
             assert_strfld(fld, mapping)
+
 
 def check_coordinates(doc):
     '''Check coordinates values.'''
@@ -86,7 +93,7 @@ def check_coordinates(doc):
                 raise AssertionError(f'Field `{fld}` is missing.')
         try:
             assert(
-                isinstance(mapping['elevation_meters'], int) or \
+                isinstance(mapping['elevation_meters'], int) or
                 math.isnan(mapping['elevation_meters'])
             )
         except (AssertionError, TypeError):
@@ -96,12 +103,14 @@ def check_coordinates(doc):
         except KeyError:
             raise AssertionError('Field `elevation_meters` missing.')
 
+
 def check_ref(doc):
     '''Check a `ref` document for correctness.'''
     assert_strfld('citation', doc)
     check_graphemes2phonemes(doc)
     check_ref_allophones(doc)
     check_strlist('notes', doc)
+
 
 def check_synthesis(doc):
     '''Check a `synthesis` document for correctness.'''
@@ -119,6 +128,7 @@ def check_synthesis(doc):
     assert_boolean('laryngeal_harmony', doc)
     check_strlist('notes', doc)
 
+
 def docs_by_doctype(docs):
     '''Return synthesis and ref docs separately.'''
     synth = None
@@ -129,7 +139,7 @@ def docs_by_doctype(docs):
         except AssertionError:
             raise AssertionError(f"Unrecognized doctype \'{doc['doctype']}\'")
         except KeyError:
-            raise AssertionError(f'Found a document with no `doctype`.')
+            raise AssertionError('Found a document with no `doctype`.')
         if doc['doctype'] == 'synthesis':
             try:
                 assert(synth is None)
@@ -140,6 +150,7 @@ def docs_by_doctype(docs):
             refs.append(doc)
     return (synth, refs)
 
+
 def check_docs(docs):
     '''Check docs read from a yaml file for correctness and completeness.'''
     synth, refs = docs_by_doctype(docs)
@@ -148,6 +159,7 @@ def check_docs(docs):
     check_synthesis(synth)
     for ref in refs:
         check_ref(ref)
+
 
 def test_read_yaml():
     errors = ''
