@@ -3,6 +3,7 @@
 import glob
 import math
 import yaml
+from python.saphon.io import YAMLLang
 
 
 def check_dictfld(fld, d):
@@ -151,25 +152,29 @@ def docs_by_doctype(docs):
     return (synth, refs)
 
 
-def check_docs(docs):
+def check_yaml(fname):
     '''Check docs read from a yaml file for correctness and completeness.'''
-    synth, refs = docs_by_doctype(docs)
-    assert(synth is not None)
-    assert(refs != [])
-    check_synthesis(synth)
-    for ref in refs:
+    lang = YAMLLang(fname)
+    assert(lang.synthesis is not None)
+    assert(lang.refs != [])
+    check_synthesis(lang.synthesis)
+    for ref in lang.refs:
         check_ref(ref)
 
 
 def test_read_yaml():
     errors = ''
-    for fname in glob.glob('data/*.yaml'):
-        with open(fname, 'r') as fh:
-            docs = list(yaml.safe_load_all(fh))
-            try:
-                check_docs(docs)
-            except Exception as e:
-                errors += f'Error in {fname}: {e}\n'
+    yamlfiles = glob.glob('langs/*.yaml')
+    min_expected = 300
+    try:
+        assert(len(yamlfiles) > min_expected)
+    except AssertionError:
+        raise AssertionError(f'Expected to find at least {min_expected} yaml files and found {len(yamlfiles)}')
+    for fname in yamlfiles:
+        try:
+            check_yaml(fname)
+        except Exception as e:
+            errors += f'Error in {fname}: {e}\n'
     try:
         assert(errors == '')
     except AssertionError:
