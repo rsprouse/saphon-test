@@ -1,0 +1,32 @@
+name: Publish to linguistics
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: make clean
+      run: make clean
+      working-directory: website
+    - name: make html
+      run: make html
+      working-directory: website
+      env:
+        PYTHONPATH: ../python
+    - name: Install SSH key
+      uses: shimataro/ssh-key-action@v2
+      with:
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
+    - name: rsync over ssh
+      run: rsync -a html/* saphon_deployer@linguistics.berkeley.edu:/home/sites/saphon/
+      working-directory: website
+
