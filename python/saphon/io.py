@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import csv, math, re, sys, os, unicodedata
 import glob
 import yaml
@@ -85,6 +86,22 @@ with existing code based on .txt files.'''
                 self.synthesis = doc
             elif doc['doctype'] == 'ref':
                 self.refs.append(doc)
+
+        # Filter None values out of list values.
+        listflds = (
+            'alternate_names', 'iso_codes', 'countries', 'coordinates',
+            'phonemes', 'allophones', 'notes'
+        )
+        for fld in listflds:
+            self.synthesis[fld] = [v for v in self.synthesis[fld] if v is not None]
+        print(yamlfile)
+        for ref in self.refs:
+            for fld in ('graphemes2phonemes', 'ref_allophones', 'ref_notes'):
+                try:
+                    ref[fld] = [v for v in ref[fld] if v is not None]
+                except:
+                    print(ref)
+                    raise
 
  
 nan = float('nan')
@@ -194,9 +211,9 @@ def writeSaphonFiles(dir, lang_, feat_):
       fo.write('bib: ' + bib + '\n')
 
 
-def readSaphonYAMLFiles(yamldir):
+def readSaphonYAMLFiles(yamldir, ipatable):
     '''Read all saphon .yaml datafiles.'''
-    featInfo = readFeatList('resources/ipa-table.txt')
+    featInfo = readFeatList(ipatable)
     featOrder = featInfo.order()
 
     lang_ = []
@@ -206,16 +223,20 @@ def readSaphonYAMLFiles(yamldir):
         refs = ylang.refs
         phonemes = [
             normalizeIPA(p) for p in synth['phonemes']
-        ].sort(key = lambda p: featOrder[p])
+        ]
+        phonemes.sort(key = lambda p: featOrder[p])
+        for fld in ('nasal_harmony', 'tone', 'laryngeal_harmony'):
+            if synth[fld] is True:
+                phonemes.append(fld)
         geography = [
-            Geo(c.latitude, c.longitude, c.elevation_meters) \
+            Geo(c['latitude'], c['longitude'], c['elevation_meters']) \
                 for c in synth['coordinates']
         ]
         lang_.append(
             Lang(
                 name=synth['name'],
                 nameShort=synth['short_name'],
-                nameAlt_=synth['alternative_names'],
+                nameAlt_=synth['alternate_names'],
                 nameComp=os.path.splitext(os.path.basename(fname))[0],
                 iso_=synth['iso_codes'],
                 family=familyName(synth['family'], synth['name']),
