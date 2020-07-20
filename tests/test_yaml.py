@@ -110,7 +110,7 @@ def check_ref(doc):
     assert_strfld('citation', doc)
     check_graphemes2phonemes(doc)
     check_ref_allophones(doc)
-    check_strlist('notes', doc)
+    check_strlist('ref_notes', doc)
 
 
 def check_synthesis(doc):
