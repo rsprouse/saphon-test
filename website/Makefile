@@ -10,7 +10,7 @@ ifdef GOOGLE_MAPS_API_KEY
 	python ../python/saphon/web/write.py ../langs html ../resources/ipa-table.txt
 	rsync -a intact/* html
 else
-	@echo 1>&2 "The GOOGLE_MAPS_API_KEY must be set. (If deploying on github, set as a github repo secret.)"
+	@echo 1>&2 "The GOOGLE_MAPS_API_KEY environment variable must be set. (If deploying on github, set as a github repo secret.)"
 	false
 endif
 
