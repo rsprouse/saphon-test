@@ -10,7 +10,7 @@ alternate_names:
 iso_codes: 
 - axb
 
-family: 
+family: Guaicuru
 
 countries: 
 - Argentina
@@ -48,5 +48,5 @@ graphemes2phonemes:
 ref_allophones: 
 -
 
-notes:
+ref_notes:
 -
