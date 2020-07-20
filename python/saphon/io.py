@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import csv, math, re, sys, os, unicodedata
 import glob
 import yaml
