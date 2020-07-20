@@ -26,6 +26,7 @@ jobs:
       working-directory: website
       env:
         PYTHONPATH: ../python
+        GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY_foo }}
     - name: Install SSH key
       uses: shimataro/ssh-key-action@v2
       with:
