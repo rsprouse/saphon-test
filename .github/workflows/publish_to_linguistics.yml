@@ -35,4 +35,8 @@ jobs:
     - name: rsync over ssh
       run: rsync -a html/* saphon_deployer@linguistics.berkeley.edu:/home/sites/saphon/
       working-directory: website
+      env:
+        DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+        DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
 
