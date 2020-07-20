@@ -13,9 +13,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: make clean
-      run: make clean
-      working-directory: website
     - name: make html
       run: make html
       working-directory: website
