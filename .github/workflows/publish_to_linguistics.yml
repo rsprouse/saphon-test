@@ -73,5 +73,5 @@ jobs:
       env:
         DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
         DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-        DEPLOY_PATH: ${{ secrets.DEPLOY_PATH_PRERELEASE }}
+        DEPLOY_PATH_PRERELEASE: ${{ secrets.DEPLOY_PATH_PRERELEASE }}
 
