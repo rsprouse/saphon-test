@@ -53,7 +53,12 @@ jobs:
         pip install PyYAML
     - name: Set release deployment path
       if: ${{ endsWith(github.ref, '-release') }}
-      echo "::set-env name=DEPLOY_PATH::${{ secrets.DEPLOY_PATH }}"
+      run:
+        echo "::set-env name=DEPLOY_PATH::${{ secrets.DEPLOY_PATH }}"
+    - name: Set prerelease deployment path
+      if: ${{ endsWith(github.ref, '-prerelease') }}
+      run:
+        echo "::set-env name=DEPLOY_PATH::${{ secrets.DEPLOY_PATH_PRERELEASE }}"
     - name: make html
       run: make html
       working-directory: website
