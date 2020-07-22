@@ -26,15 +26,14 @@
 name: Publish a release to linguistics
 
 on:
-  push:
+  release:
     branches: [ master ]
-    tags:
-      - v*-release
-      - v*-prerelease
+    types: 
+      - released
+      - prereleased
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     env:
       DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
@@ -52,11 +51,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install PyYAML
     - name: Set release deployment path
-      if: ${{ endsWith(github.ref, '-release') }}
+      if: "!github.event.release.prerelease"
       run:
         echo "::set-env name=DEPLOY_PATH::${{ secrets.DEPLOY_PATH }}"
     - name: Set prerelease deployment path
-      if: ${{ endsWith(github.ref, '-prerelease') }}
+      if: "github.event.release.prerelease"
       run:
         echo "::set-env name=DEPLOY_PATH::${{ secrets.DEPLOY_PATH_PRERELEASE }}"
     - name: make html
