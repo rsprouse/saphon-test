@@ -23,7 +23,7 @@
 #    `ssh-keygen -t rsa -b 4096 -m PEM`, and the private key can then
 #    be copied to DEPLOY_HOST.
 
-name: Publish a release to linguistics
+name: Build website and publish to public web server
 
 on:
   release:
@@ -50,15 +50,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install PyYAML
-    - name: Set release deployment path
-      if: "!github.event.release.prerelease"
-      run:
-        echo "::set-env name=DEPLOY_PATH::${{ secrets.DEPLOY_PATH }}"
-    - name: Set prerelease deployment path
-      if: "github.event.release.prerelease"
-      run:
-        echo "::set-env name=DEPLOY_PATH::${{ secrets.DEPLOY_PATH_PRERELEASE }}"
-    - name: make html
+    - name: Build website
       run: make html
       working-directory: website
       env:
@@ -68,7 +60,15 @@ jobs:
       with:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
-    - name: rsync over ssh
+    - name: Set release deployment path
+      if: "!github.event.release.prerelease"
+      run:
+        echo "::set-env name=DEPLOY_PATH::${{ secrets.DEPLOY_PATH }}"
+    - name: Set prerelease deployment path
+      if: "github.event.release.prerelease"
+      run:
+        echo "::set-env name=DEPLOY_PATH::${{ secrets.DEPLOY_PATH_PRERELEASE }}"
+    - name: Publish to public web server with rsync over ssh
       run: rsync -a html/* ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}
       working-directory: website
 
